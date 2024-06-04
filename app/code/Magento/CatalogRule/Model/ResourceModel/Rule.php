@@ -1,14 +1,10 @@
 <?php
+
 /**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-/**
- * Catalog rules resource model
- *
- * @author      Magento Core Team <core@magentocommerce.com>
- */
 namespace Magento\CatalogRule\Model\ResourceModel;
 
 use Magento\Catalog\Model\Product;
@@ -18,6 +14,8 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 
 /**
+ * Catalog rules resource model
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
@@ -80,7 +78,6 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
     protected $entityManager;
 
     /**
-     * Rule constructor.
      * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param Product\ConditionFactory $conditionFactory
@@ -93,6 +90,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * @param PriceCurrencyInterface $priceCurrency
      * @param string|null $connectionName
      * @param EntityManager|null $entityManager
+     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -144,6 +142,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * @param int $wId
      * @param int $gId
      * @param int $pId
+     *
      * @return float|false
      */
     public function getRulePrice($date, $wId, $gId, $pId)
@@ -165,6 +164,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * @param int $websiteId
      * @param int $customerGroupId
      * @param array $productIds
+     *
      * @return array
      */
     public function getRulePrices(\DateTimeInterface $date, $websiteId, $customerGroupId, $productIds)
@@ -187,6 +187,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * @param int $websiteId
      * @param int $customerGroupId
      * @param int $productId
+     *
      * @return array
      */
     public function getRulesFromProduct($date, $websiteId, $customerGroupId, $productId)
@@ -195,6 +196,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
         if (is_string($date)) {
             $date = strtotime($date);
         }
+
         $select = $connection->select()
             ->from($this->getTable('catalogrule_product'))
             ->where('website_id = ?', $websiteId)
@@ -212,7 +214,9 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * @param \Magento\Framework\Model\AbstractModel $object
      * @param mixed $value
      * @param string $field
+     *
      * @return $this
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function load(\Magento\Framework\Model\AbstractModel $object, $value, $field = null)
@@ -234,7 +238,9 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * Delete the object
      *
      * @param \Magento\Framework\Model\AbstractModel $object
+     *
      * @return $this
+     *
      * @throws \Exception
      */
     public function delete(AbstractModel $object)
@@ -247,6 +253,7 @@ class Rule extends \Magento\Rule\Model\ResourceModel\AbstractResource
      * Get product ids matching specified rules
      *
      * @param array $ruleIds
+     *
      * @return array
      */
     public function getProductIdsByRuleIds(array $ruleIds): array
