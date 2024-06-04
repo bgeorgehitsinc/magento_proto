@@ -1416,4 +1416,27 @@ class Customer extends \Magento\Framework\Model\AbstractModel implements ResetAf
     {
         $this->_errors = [];
     }
+
+    /**
+     * Get object original data
+     *
+     * @param string $key
+     *
+     * @return array|mixed|null
+     */
+    public function getOrigData($key = null)
+    {
+        $customAttributes = $this->_origData['custom_attributes'] ?? null;
+        if ($customAttributes) {
+            foreach ($customAttributes as $customAttribute) {
+                $attributeCode = $customAttribute['attribute_code'] ?? null;
+                $value = $customAttribute['value'] ?? null;
+                if ($attributeCode && $value) {
+                    $this->_origData[$attributeCode] = $value;
+                }
+            }
+        }
+
+        return parent::getOrigData($key);
+    }
 }
