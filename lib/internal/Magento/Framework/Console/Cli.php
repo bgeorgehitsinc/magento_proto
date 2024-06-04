@@ -148,19 +148,16 @@ class Cli extends Console\Application
         try {
             if (class_exists(\Magento\Setup\Console\CommandList::class)) {
                 $setupCommandList = new \Magento\Setup\Console\CommandList($this->serviceManager);
-                $commands = array_merge($commands, $setupCommandList->getCommands());
+                $commands = [...$commands, ...$setupCommandList->getCommands()];
             }
 
             if ($this->objectManager->get(DeploymentConfig::class)->isAvailable()) {
                 /** @var CommandListInterface */
                 $commandList = $this->objectManager->create(CommandListInterface::class);
-                $commands = array_merge($commands, $commandList->getCommands());
+                $commands = [...$commands, ...$commandList->getCommands()];
             }
 
-            $commands = array_merge(
-                $commands,
-                $this->getVendorCommands($this->objectManager)
-            );
+            $commands = [...$commands, ...$this->getVendorCommands($this->objectManager)];
         } catch (\Exception $e) {
             $this->initException = $e;
         }

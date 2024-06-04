@@ -61,6 +61,9 @@ class DeploymentConfig
      */
     private $readerLoad = [];
 
+    /** @var array|null  */
+    private ?array $flattenParams = null;
+
     /**
      * Constructor
      *
@@ -247,37 +250,43 @@ class DeploymentConfig
      */
     private function flattenParams(array $params, ?string $path = null, array &$flattenResult = null): array
     {
-        if (null === $flattenResult) {
-            $flattenResult = [];
-        }
+        $paramsKey = CRC32(json_encode($params ?? ''));
 
-        foreach ($params as $key => $param) {
-            if ($path) {
-                $newPath = $path . '/' . $key;
-            } else {
-                $newPath = $key;
-            }
-            if (isset($flattenResult[$newPath])) {
-                //phpcs:ignore Magento2.Exceptions.DirectThrow
-                throw new RuntimeException(new Phrase("Key collision '%1' is already defined.", [$newPath]));
+        if (!isset($this->flattenParams[$paramsKey])) {
+            if (null === $flattenResult) {
+                $flattenResult = [];
             }
 
-            if (is_array($param)) {
-                $flattenResult[$newPath] = $param;
-                $this->flattenParams($param, $newPath, $flattenResult);
-            } else {
-                // allow reading values from env variables
-                // value need to be specified in %env(NAME, "default value")% format
-                // like #env(DB_PASSWORD), #env(DB_NAME, "test")
-                if ($param !== null && preg_match(self::ENV_NAME_PATTERN, $param, $matches)) {
-                    $param = getenv($matches['name']) ?: ($matches['default'] ?? null);
+            foreach ($params as $key => $param) {
+                if ($path) {
+                    $newPath = $path . '/' . $key;
+                } else {
+                    $newPath = $key;
+                }
+                if (isset($flattenResult[$newPath])) {
+                    //phpcs:ignore Magento2.Exceptions.DirectThrow
+                    throw new RuntimeException(new Phrase("Key collision '%1' is already defined.", [$newPath]));
                 }
 
-                $flattenResult[$newPath] = $param;
+                if (is_array($param)) {
+                    $flattenResult[$newPath] = $param;
+                    $this->flattenParams($param, $newPath, $flattenResult);
+                } else {
+                    // allow reading values from env variables
+                    // value need to be specified in %env(NAME, "default value")% format
+                    // like #env(DB_PASSWORD), #env(DB_NAME, "test")
+                    if ($param !== null && preg_match(self::ENV_NAME_PATTERN, $param, $matches)) {
+                        $param = getenv($matches['name']) ?: ($matches['default'] ?? null);
+                    }
+
+                    $flattenResult[$newPath] = $param;
+                }
             }
+
+            $this->flattenParams[$paramsKey] = $flattenResult;
         }
 
-        return $flattenResult;
+        return $this->flattenParams[$paramsKey] ?? [];
     }
 
     /**
