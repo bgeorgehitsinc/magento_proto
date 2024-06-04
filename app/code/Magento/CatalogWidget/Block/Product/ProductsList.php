@@ -3,6 +3,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 namespace Magento\CatalogWidget\Block\Product;
 
@@ -15,6 +16,7 @@ use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\ViewModel\Product\OptionsData;
 use Magento\CatalogWidget\Model\Rule;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Http\Context as HttpContext;
@@ -84,6 +86,11 @@ class ProductsList extends AbstractProduct implements BlockInterface, IdentityIn
     protected $productCollectionFactory;
 
     /**
+     * @var OptionsData
+     */
+    private $optionsDataViewModel;
+
+    /**
      * @var SqlBuilder
      */
     protected $sqlBuilder;
@@ -134,6 +141,7 @@ class ProductsList extends AbstractProduct implements BlockInterface, IdentityIn
      * @param Context $context
      * @param CollectionFactory $productCollectionFactory
      * @param Visibility $catalogProductVisibility
+     * @param OptionsData $optionsDataViewModel
      * @param HttpContext $httpContext
      * @param SqlBuilder $sqlBuilder
      * @param Rule $rule
@@ -150,6 +158,7 @@ class ProductsList extends AbstractProduct implements BlockInterface, IdentityIn
         Context $context,
         CollectionFactory $productCollectionFactory,
         Visibility $catalogProductVisibility,
+        OptionsData $optionsDataViewModel = null,
         HttpContext $httpContext,
         SqlBuilder $sqlBuilder,
         Rule $rule,
@@ -162,6 +171,7 @@ class ProductsList extends AbstractProduct implements BlockInterface, IdentityIn
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->catalogProductVisibility = $catalogProductVisibility;
+        $this->optionsDataViewModel = $optionsDataViewModel ?: ObjectManager::getInstance()->get(OptionsData::class);
         $this->httpContext = $httpContext;
         $this->sqlBuilder = $sqlBuilder;
         $this->rule = $rule;
@@ -286,6 +296,16 @@ class ProductsList extends AbstractProduct implements BlockInterface, IdentityIn
             $this->rendererListBlock = $layout->getBlock('category.product.type.widget.details.renderers');
         }
         return $this->rendererListBlock;
+    }
+
+    /**
+     * Get the view model.
+     *
+     * @return OptionsData
+     */
+    public function getViewModel(): OptionsData
+    {
+        return $this->optionsDataViewModel;
     }
 
     /**
